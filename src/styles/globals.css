@@ -1,14 +1,17 @@
 @import 'tailwindcss';
-@font-face{font-family:'ArkPixel';src:url('/fonts/ark-pixel-16px.woff2') format('woff2');font-display:swap}
-@font-face{font-family:'SarasaFixed';src:url('/fonts/SarasaGothicFixed.ttf') format('truetype');font-display:swap}
+@font-face{
+  font-family:'FusionPixel';
+  src:url('/fonts/fusion-pixel-12px-monospaced-zh_hant.otf.woff2') format('woff2');
+  font-display:swap
+}
 @theme{
-  --font-mono:'ArkPixel','SarasaFixed',monospace;
+  --font-mono:'FusionPixel',monospace;
   --color-terminal-bg:#000;
   --color-terminal-fg:#0f0;
   --caret-blink-speed:1s;
 }
 @layer base{
-  html,body{@apply bg-[var(--color-terminal-bg)] text-[var(--color-terminal-fg)] font-mono}
+  html,body{@apply bg-[var(--color-terminal-bg)] text-[var(--color-terminal-fg)] font-mono text-xs}
 }
 @layer utilities{
   .caret-blink{animation:caret-blink var(--caret-blink-speed) step-end infinite}
