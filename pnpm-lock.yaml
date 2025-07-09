@@ -20,12 +20,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.1.0(react@19.1.0)
-      xterm:
-        specifier: ^5.3.0
-        version: 5.3.0
-      xterm-for-react:
-        specifier: ^1.0.4
-        version: 1.0.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react-terminal-ui:
+        specifier: ^1.4.0
+        version: 1.4.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
@@ -1564,6 +1561,12 @@ packages:
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
+  react-terminal-ui@1.4.0:
+    resolution: {integrity: sha512-3eMdxCDiW3eBwsp0QBz6i8va0XTO8d91nBgnL5p9f3kAwIrHBu23oH+RbXGp4as/p05srMBFiDMRzRubT1VEsQ==}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+
   react@19.1.0:
     resolution: {integrity: sha512-FS+XFBNvn3GTAWq26joslQgWNoFu08F4kl0J4CgdNKADkdSGXQyTCnKteIAJy96Br6YbpEU1LSzV5dYtjMkMDg==}
     engines: {node: '>=0.10.0'}
@@ -1826,20 +1829,6 @@ packages:
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
-
-  xterm-for-react@1.0.4:
-    resolution: {integrity: sha512-DCkLR9ZXeW907YyyaCTk/3Ol34VRHfCnf3MAPOkj3dUNA85sDqHvTXN8efw4g7bx7gWdJQRsEpGt2tJOXKG3EQ==}
-    peerDependencies:
-      react: ^16.0.0
-      react-dom: ^16.0.0
-
-  xterm@4.19.0:
-    resolution: {integrity: sha512-c3Cp4eOVsYY5Q839dR5IejghRPpxciGmLWWaP9g+ppfMeBChMeLa1DCA+pmX/jyDZ+zxFOmlJL/82qVdayVoGQ==}
-    deprecated: This package is now deprecated. Move to @xterm/xterm instead.
-
-  xterm@5.3.0:
-    resolution: {integrity: sha512-8QqjlekLUFTrU6x7xck1MsPzPA571K5zNqWm0M0oroYEWVOptZ0+ubQSkQ3uxIEhcIHRujJy6emDWX4A7qyFzg==}
-    deprecated: This package is now deprecated. Move to @xterm/xterm instead.
 
   yallist@5.0.0:
     resolution: {integrity: sha512-YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw==}
@@ -3449,6 +3438,11 @@ snapshots:
 
   react-is@16.13.1: {}
 
+  react-terminal-ui@1.4.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+
   react@19.1.0: {}
 
   reflect.getprototypeof@1.0.10:
@@ -3841,17 +3835,6 @@ snapshots:
       isexe: 2.0.0
 
   word-wrap@1.2.5: {}
-
-  xterm-for-react@1.0.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
-    dependencies:
-      prop-types: 15.8.1
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      xterm: 4.19.0
-
-  xterm@4.19.0: {}
-
-  xterm@5.3.0: {}
 
   yallist@5.0.0: {}
 
