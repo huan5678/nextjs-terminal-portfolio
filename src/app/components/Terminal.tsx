@@ -1,9 +1,17 @@
 'use client';
 import React, { useState } from 'react';
 import Terminal, { ColorMode, TerminalOutput } from 'react-terminal-ui';
+import AsciiHero from '@/app/components/AsciiHero';
+import ProgressBar from '@/app/components/ProgressBar';
 
 export default function TerminalController() {
   const [terminalLineData, setTerminalLineData] = useState([
+    <TerminalOutput key="progress">
+      <ProgressBar />
+    </TerminalOutput>,
+    <TerminalOutput key="hero">
+      <AsciiHero />
+    </TerminalOutput>,
     <TerminalOutput key="welcome">Type help then Enter</TerminalOutput>
   ]);
 
@@ -22,7 +30,7 @@ export default function TerminalController() {
     } else if (cmd) {
       newTerminalLineData.push(<TerminalOutput key={`not-found-${Date.now()}`}>{`command not found: ${cmd}`}</TerminalOutput>);
     }
-    
+
     setTerminalLineData(newTerminalLineData);
   };
 
@@ -32,7 +40,7 @@ export default function TerminalController() {
             name="Terminal"
             colorMode={ ColorMode.Dark }
             onInput={ onInput }
-            prompt="$"
+            prompt=">"
         >
             { terminalLineData }
         </Terminal>

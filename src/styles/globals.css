@@ -1,18 +1,23 @@
 @import 'tailwindcss';
-@font-face{
-  font-family:'FusionPixel';
-  src:url('/fonts/fusion-pixel-12px-monospaced-zh_hant.otf.woff2') format('woff2');
-  font-display:swap
-}
+
 @theme{
   --font-mono:'FusionPixel',monospace;
   --color-terminal-bg:#000;
   --color-terminal-fg:#0f0;
   --caret-blink-speed:1s;
 }
-@layer base{
-  html,body{@apply bg-[var(--color-terminal-bg)] text-[var(--color-terminal-fg)] font-mono text-xs}
+@layer base {
+  html, body {
+    @apply bg-[var(--color-terminal-bg)] text-[var(--color-terminal-fg)] text-xs;
+  }
 }
+
+@layer components {
+  .react-terminal-wrapper {
+    font-family: var(--font-fusion-pixel), monospace !important;
+  }
+}
+
 @layer utilities{
   .caret-blink{animation:caret-blink var(--caret-blink-speed) step-end infinite}
   @keyframes caret-blink{50%{opacity:0}}
