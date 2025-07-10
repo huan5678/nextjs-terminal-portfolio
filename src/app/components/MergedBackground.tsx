@@ -1,6 +1,6 @@
 const MergedBackground = () => {
   return (
-    <div className="min-h-screen w-full relative">
+    <div className="fixed inset-0 -z-10">
       {/* Black Grid Background Layer with Fade Out */}
       <div
         className="absolute inset-0 z-0"
@@ -13,7 +13,7 @@ const MergedBackground = () => {
           backgroundSize: "40px 40px",
         }}
       />
-      
+
       {/* Grid Fade Out Mask */}
       <div
         className="absolute inset-0 z-5"
@@ -21,7 +21,7 @@ const MergedBackground = () => {
           background: "linear-gradient(to bottom, transparent 0%, transparent 30%, #000000 100%)",
         }}
       />
-      
+
       {/* Dark Horizon Glow Overlay */}
       <div
         className="absolute inset-0 z-10"

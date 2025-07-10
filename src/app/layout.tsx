@@ -10,7 +10,7 @@ const fusionPixel = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "MY SITE",
+  title: "SHR-HUAN-AI",
   description: "Next.js Terminal",
 };
 
@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={fusionPixel.variable}>
-            <body>
+      <body className="relative z-10">
         <MergedBackground />
         {children}
       </body>

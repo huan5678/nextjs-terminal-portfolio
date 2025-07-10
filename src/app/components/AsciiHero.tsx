@@ -1,3 +1,5 @@
+import TypingAnimation from "./TypingAnimation";
+
 const asciiLogo = `
 
  ████████╗  ██████╗      ██████╗  ███████╗      ██████╗  ██████╗  ███╗   ██╗ ████████╗ ██╗ ███╗   ██╗ ██╗   ██╗ ███████╗ ██████╗
@@ -13,14 +15,18 @@ const asciiLogo = `
  ╚════██║ ██╔══██║ ██╔══██╗ ██╔══██║ ██║   ██║ ██╔══██║ ██║╚██╗██║     ██╔══██║ ██║
  ███████║ ██║  ██║ ██║  ██║ ██║  ██║ ╚██████╔╝ ██║  ██║ ██║ ╚████║ ██╗ ██║  ██║ ██║
  ╚══════╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝  ╚═════╝  ╚═╝  ╚═╝ ╚═╝  ╚═══╝ ╚═╝ ╚═╝  ╚═╝ ╚═╝
+
 `;
 
 export default function AsciiHero() {
   return (
     <section className='py-6'>
-      <pre className='text-[10px] leading-[10px] select-none text-green-400 font-bold whitespace-nowrap'>{asciiLogo}</pre>
+      <pre className='text-[10px] leading-[10px] select-none text-green-400 font-bold'>{asciiLogo}</pre>
       <div className="mt-4 text-green-300 text-xs opacity-80">
-        Welcome to Dev Terminal v1.0.0
+        <TypingAnimation
+          className="text-base font-normal font-mono text-green-300 text-left"
+          text="Welcome to Dev Terminal v1.0.0"
+        />
       </div>
     </section>
   );
