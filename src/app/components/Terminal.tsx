@@ -1,15 +1,20 @@
+
 'use client';
-import React, { useState, useEffect } from 'react';
-import Terminal, { ColorMode, TerminalOutput } from 'react-terminal-ui';
-import AsciiHero from '@/app/components/AsciiHero';
-import ProgressBar from '@/app/components/ProgressBar';
+import React, { useState, useEffect, useRef } from 'react';
 import About from '@/app/components/About';
 import Skills from '@/app/components/Skills';
 import Projects from '@/app/components/Projects';
 import Contact from '@/app/components/Contact';
 
 export default function TerminalController() {
-  const commandDescriptions: { [ key: string ]: string } = {
+  const [history, setHistory] = useState<React.ReactNode[]>([]);
+  const [prompt, setPrompt] = useState('');
+
+  const terminalRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const commandDescriptions: { [key: string]: string } = {
     about: 'About me',
     skills: 'My professional skills',
     projects: 'My featured projects',
@@ -25,35 +30,18 @@ export default function TerminalController() {
       <p className="mb-2 text-neutral-300">Available commands:</p>
       <ul className="list-none pl-2">
         {commandList.map((cmd) => (
-          <li key={cmd} className="flex items-center gap-x-4">
+          <li key={cmd} className="flex items-center gap-x-4 text-lg">
             <span className="text-cyan-400 w-20">{cmd}</span>
-            <span className="text-neutral-400">{commandDescriptions[ cmd ]}</span>
+            <span className="text-neutral-400">{commandDescriptions[cmd]}</span>
           </li>
         ))}
       </ul>
     </div>
   );
 
-  const [terminalLineData, setTerminalLineData] = useState([
-    <TerminalOutput key="progress">
-      <ProgressBar />
-    </TerminalOutput>,
-    <TerminalOutput key="hero">
-      <AsciiHero />
-    </TerminalOutput>,
-    <TerminalOutput key="welcome">
-      <p>Welcome to my interactive terminal portfolio.</p>
-      <p className="mt-1">
-        Type &apos;<span className="text-cyan-400">help</span>&apos; to see the list of available commands.
-      </p>
-    </TerminalOutput>
-  ]);
-
-  const onInput = (input: string) => {
-    let newTerminalLineData = [...terminalLineData];
-    newTerminalLineData.push(<TerminalOutput key={`input-${Date.now()}`}>{`$ ${input}`}</TerminalOutput>);
-
-    const cmd = input.toLocaleLowerCase().trim();
+  const processCommand = (command: string) => {
+    const newHistory = [...history, <div key={history.length}><span className="text-cyan-400">&gt;</span> {command}</div>];
+    const cmd = command.toLowerCase().trim();
     let output: React.ReactNode = null;
 
     switch (cmd) {
@@ -73,52 +61,84 @@ export default function TerminalController() {
         output = <HelpComponent />;
         break;
       case 'clear':
-        newTerminalLineData = [];
-        break;
+        setHistory([]);
+        return;
       case '':
         break;
       default:
         output = (
-          <p className="text-red-400">
-            Command not found: {cmd}. Type &apos;help&apos; for available commands.
+          <p className="text-red-400 text-lg">
+            Command not found: {cmd}. Type 'help' for available commands.
           </p>
         );
         break;
     }
 
     if (output) {
-      newTerminalLineData.push(<TerminalOutput key={`output-${Date.now()}`}>{output}</TerminalOutput>);
+      newHistory.push(<div key={newHistory.length}>{output}</div>);
     }
-
-    setTerminalLineData(newTerminalLineData);
+    setHistory(newHistory);
   };
 
-  useEffect(() => {
-    const terminal = document.querySelector('[data-rbd-droppable-id="terminal-wrapper"] > div');
-
-    if (terminal) {
-      const observer = new MutationObserver(() => {
-        terminal.scrollTop = terminal.scrollHeight;
-      });
-
-      observer.observe(terminal, { childList: true, subtree: true });
-
-      return () => {
-        observer.disconnect();
-      };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      processCommand(prompt);
+      setPrompt('');
     }
-  }, [terminalLineData]);
+  };
+
+  // Initial welcome message
+  useEffect(() => {
+    setHistory([
+        <div key="welcome">
+            <p className="text-lg">Welcome to my interactive terminal portfolio.</p>
+            <p className="mt-1 text-lg">
+                Type &apos;<span className="text-cyan-400">help</span>&apos; to see the list of available commands.
+            </p>
+        </div>
+    ]);
+    inputRef.current?.focus();
+  }, []);
+
+  // MutationObserver for scrolling
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+        bottomRef.current?.scrollIntoView();
+    });
+
+    if (terminalRef.current) {
+        observer.observe(terminalRef.current, { childList: true, subtree: true });
+    }
+
+    return () => {
+        observer.disconnect();
+    };
+  }, []);
+
+  const handleClick = () => {
+    inputRef.current?.focus();
+  }
 
   return (
-    <div className="h-[400px] w-full border border-green-600/30">
-        <Terminal
-            name="Terminal"
-            colorMode={ ColorMode.Dark }
-            onInput={ onInput }
-            prompt=">"
-        >
-            { terminalLineData }
-        </Terminal>
+    <div
+        className="h-[400px] w-full border border-green-600/30 bg-black p-4 rounded-md font-mono flex flex-col"
+        onClick={handleClick}
+    >
+        <div className="flex-grow overflow-y-auto" ref={terminalRef}>
+            {history}
+            <div ref={bottomRef} />
+        </div>
+        <div className="flex items-center mt-2 flex-shrink-0">
+            <span className="text-cyan-400 text-lg">&gt;</span>
+            <input
+                ref={inputRef}
+                type="text"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="bg-transparent border-none text-white focus:outline-none w-full ml-2 text-lg"
+            />
+        </div>
     </div>
   );
 }

@@ -1,7 +1,9 @@
-import MergedBackground from "./components/MergedBackground";
 import type { Metadata } from "next";
 import localFont from 'next/font/local';
-import "../styles/globals.css";
+import "primereact/resources/themes/lara-dark-cyan/theme.css";
+import "primeicons/primeicons.css";
+import "@/styles/globals.css";
+import MergedBackground from "@/app/components/MergedBackground";
 
 const fusionPixel = localFont({
   src: '../../public/fonts/fusion-pixel-12px-monospaced-zh_hant.otf.woff2',
@@ -13,15 +15,14 @@ export const metadata: Metadata = {
   title: "SHR-HUAN-AI",
   description: "Next.js Terminal",
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={fusionPixel.variable}>
-      <body className="relative z-10">
+    <html lang="zh-tw">
+      <body className={fusionPixel.variable}>
         <MergedBackground />
         {children}
       </body>
