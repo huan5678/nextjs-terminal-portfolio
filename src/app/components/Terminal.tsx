@@ -5,14 +5,20 @@ import About from '@/app/components/About';
 import Skills from '@/app/components/Skills';
 import Projects from '@/app/components/Projects';
 import Contact from '@/app/components/Contact';
+import { useChat } from 'ai/react';
+import CommandPanel from '@/app/components/CommandPanel';
+import ProgressBar from '@/app/components/ProgressBar';
 
-export default function TerminalController() {
+export default function TerminalController({ isChatMode, onExitChat, onEnterChat }) {
   const [history, setHistory] = useState<React.ReactNode[]>([]);
   const [prompt, setPrompt] = useState('');
-
+  const [showCommandPanel, setShowCommandPanel] = useState(false);
+  
   const terminalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const { messages, input, handleInputChange, handleSubmit, setMessages, setInput, isLoading } = useChat();
 
   const commandDescriptions: { [key: string]: string } = {
     about: 'About me',
@@ -20,6 +26,7 @@ export default function TerminalController() {
     projects: 'My featured projects',
     contact: 'How to reach me',
     help: 'Shows this help message',
+    command: 'Show command panel',
     clear: 'Clears the terminal history',
   };
 
@@ -30,7 +37,7 @@ export default function TerminalController() {
       <p className="mb-2 text-neutral-300">Available commands:</p>
       <ul className="list-none pl-2">
         {commandList.map((cmd) => (
-          <li key={cmd} className="flex items-center gap-x-4 text-lg">
+          <li key={cmd} className="flex items-center gap-x-4">
             <span className="text-cyan-400 w-20">{cmd}</span>
             <span className="text-neutral-400">{commandDescriptions[cmd]}</span>
           </li>
@@ -63,11 +70,14 @@ export default function TerminalController() {
       case 'clear':
         setHistory([]);
         return;
+      case 'command':
+        setShowCommandPanel(true);
+        break;
       case '':
         break;
       default:
         output = (
-          <p className="text-red-400 text-lg">
+          <p className="text-red-400">
             Command not found: {cmd}. Type 'help' for available commands.
           </p>
         );
@@ -82,23 +92,44 @@ export default function TerminalController() {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      processCommand(prompt);
-      setPrompt('');
+        if (isChatMode) {
+            if (input.trim().toLowerCase() === 'exit') {
+                onExitChat();
+                setMessages([]); // Clear chat history when exiting
+            } else {
+                handleSubmit(e as any);
+            }
+        } else {
+            processCommand(prompt);
+            setPrompt('');
+        }
     }
   };
 
-  // Initial welcome message
+  // Handle chat mode entry/exit and initial welcome message
   useEffect(() => {
-    setHistory([
-        <div key="welcome">
-            <p className="text-lg">Welcome to my interactive terminal portfolio.</p>
-            <p className="mt-1 text-lg">
-                Type &apos;<span className="text-cyan-400">help</span>&apos; to see the list of available commands.
-            </p>
-        </div>
-    ]);
+    if (isChatMode) {
+        setHistory([
+            <div key="chat-welcome">
+                <p>You are now in chat mode. Type 'exit' to return to the main menu.</p>
+            </div>
+        ]);
+        setPrompt(''); // Clear prompt when entering chat mode
+        setInput(''); // Clear chat input when entering chat mode
+    } else {
+        setHistory([
+            <div key="welcome">
+                <p>Welcome to my interactive terminal portfolio.</p>
+                <p className="mt-1">
+                    Type &apos;<span className="text-cyan-400">help</span>&apos; to see the list of available commands.
+                </p>
+            </div>
+        ]);
+        setPrompt(''); // Clear prompt when exiting chat mode
+        setInput(''); // Clear chat input when exiting chat mode
+    }
     inputRef.current?.focus();
-  }, []);
+  }, [isChatMode, setInput]);
 
   // MutationObserver for scrolling
   useEffect(() => {
@@ -119,24 +150,49 @@ export default function TerminalController() {
     inputRef.current?.focus();
   }
 
+  const promptPrefix = isChatMode ? 'chat' : '';
+  const promptSuffix = '>';
+
   return (
-    <div
-        className="h-[400px] w-full border border-green-600/30 bg-black p-4 rounded-md font-mono flex flex-col"
+    <div 
+        className="h-[400px] w-full border border-green-600/30 bg-black p-4 rounded-md font-mono flex flex-col text-lg"
         onClick={handleClick}
     >
         <div className="flex-grow overflow-y-auto" ref={terminalRef}>
-            {history}
+            {!isChatMode && history}
+            {isChatMode && (
+                <>
+                    {history} {/* Display chat mode welcome/hint */}
+                    {messages.map(m => (
+                        <div key={m.id}>
+                            <strong>{`${m.role === 'user' ? 'You' : 'AI'}: `}</strong>
+                            {m.content}
+                        </div>
+                    ))}
+                </>
+            )}
             <div ref={bottomRef} />
         </div>
+        {showCommandPanel && (
+            <CommandPanel 
+                onKonamiCode={() => {
+                    onEnterChat();
+                    setShowCommandPanel(false);
+                }}
+                onClose={() => setShowCommandPanel(false)}
+            />
+        )}
+        {isChatMode && isLoading && <ProgressBar isLoading={true} />}
         <div className="flex items-center mt-2 flex-shrink-0">
-            <span className="text-cyan-400 text-lg">&gt;</span>
+            {promptPrefix && <span className="text-cyan-400 mr-1">{promptPrefix}</span>}
+            <span className="text-cyan-400">{promptSuffix}</span>
             <input
                 ref={inputRef}
                 type="text"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
+                value={isChatMode ? input : prompt}
+                onChange={isChatMode ? handleInputChange : (e) => setPrompt(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="bg-transparent border-none text-white focus:outline-none w-full ml-2 text-lg"
+                className="bg-transparent border-none text-white focus:outline-none w-full ml-2"
             />
         </div>
     </div>
