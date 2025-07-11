@@ -18,7 +18,9 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const { messages, input, handleInputChange, handleSubmit, setMessages, setInput, isLoading } = useChat();
+  const { messages, input, handleInputChange, handleSubmit, setMessages, setInput, isLoading } = useChat({
+    streamProtocol: 'text',
+  });
 
   const commandDescriptions: { [key: string]: string } = {
     about: 'About me',
@@ -164,11 +166,14 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
                 <>
                     {history} {/* Display chat mode welcome/hint */}
                     {messages.map(m => (
-                        <div key={m.id}>
+                        <div key={m.id} className="mb-1">
                             <strong>{`${m.role === 'user' ? 'You' : 'AI'}: `}</strong>
-                            {m.content}
+                            <span className={`${m.role === 'assistant' ? 'text-green-400' : 'text-white'}`}>
+                                {m.content}
+                            </span>
                         </div>
                     ))}
+                    {isLoading && <ProgressBar isLoading={true} />}
                 </>
             )}
             <div ref={bottomRef} />
@@ -182,7 +187,6 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
                 onClose={() => setShowCommandPanel(false)}
             />
         )}
-        {isChatMode && isLoading && <ProgressBar isLoading={true} />}
         <div className="flex items-center mt-2 flex-shrink-0">
             {promptPrefix && <span className="text-cyan-400 mr-1">{promptPrefix}</span>}
             <span className="text-cyan-400">{promptSuffix}</span>
