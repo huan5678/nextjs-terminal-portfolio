@@ -5,6 +5,7 @@ export interface Theme {
     primary: string;
     secondary: string;
     background: string;
+    backgroundSecondary: string;
     surface: string;
     text: string;
     textSecondary: string;

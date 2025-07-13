@@ -10,11 +10,13 @@ export class GameManager {
   private gameState: React.MutableRefObject<GameState>;
   private forceUpdate: () => void;
   private p: p5;
+  private onGameOver?: () => void;
 
-  constructor(gameState: React.MutableRefObject<GameState>, forceUpdate: () => void, p: p5) {
+  constructor(gameState: React.MutableRefObject<GameState>, forceUpdate: () => void, p: p5, onGameOver?: () => void) {
     this.gameState = gameState;
     this.forceUpdate = forceUpdate;
     this.p = p;
+    this.onGameOver = onGameOver;
   }
 
   createBall(x: number, y: number, vx: number, vy: number): Ball {
@@ -39,7 +41,7 @@ export class GameManager {
             y: i * (brickHeight + 2) + 40,
             w: brickWidth,
             h: brickHeight,
-            color: GAME_CONSTANTS.BRICK_COLORS[char] || [128, 128, 128],
+            color: GAME_CONSTANTS.BRICK_COLORS[char as keyof typeof GAME_CONSTANTS.BRICK_COLORS] || [128, 128, 128],
             isPowerUp: char === 'P'
           });
         }
@@ -50,7 +52,7 @@ export class GameManager {
   }
 
   spawnPowerUp(x: number, y: number): void {
-    const type = this.p.random(GAME_CONSTANTS.POWER_UP_TYPES);
+    const type = this.p.random([...GAME_CONSTANTS.POWER_UP_TYPES]);
     let char = '?';
     let color: [number, number, number] = [255, 255, 255];
 
@@ -168,7 +170,9 @@ export class GameManager {
           if (bricks.length === 0) {
             gameState.level++;
             AudioSystem.playSound('level_up');
-            gameState.paddle.w = 80;
+            if (gameState.paddle) {
+              gameState.paddle.w = 80;
+            }
             this.initializeGame();
             setTimeout(() => {
               this.startBallMovement();
@@ -192,6 +196,10 @@ export class GameManager {
           } else {
             gameState.state = 'gameOver';
             this.forceUpdate();
+            // 觸發遊戲結束回調
+            if (this.onGameOver) {
+              this.onGameOver();
+            }
           }
         }
       }

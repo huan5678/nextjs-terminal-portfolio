@@ -10,10 +10,17 @@ import ProgressBar from '@/app/components/ProgressBar';
 import dynamic from 'next/dynamic';
 import { useTheme } from '@/contexts/ThemeContext';
 import { themes } from '@/config/themes';
+import Leaderboard from './Leaderboard';
 
 import PixelSmash from './PixelSmash';
 
-export default function TerminalController({ isChatMode, onExitChat, onEnterChat }) {
+interface TerminalControllerProps {
+  isChatMode: boolean;
+  onExitChat: () => void;
+  onEnterChat: () => void;
+}
+
+export default function TerminalController({ isChatMode, onExitChat, onEnterChat }: TerminalControllerProps) {
   const [history, setHistory] = useState<React.ReactNode[]>([]);
   const [prompt, setPrompt] = useState('');
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
@@ -36,6 +43,7 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
     projects: 'My featured projects',
     contact: 'How to reach me',
     game: 'Run the PIXEL_SMASH game',
+    leaderboard: 'Show PixelSmash world leaderboard',
     theme: 'Change terminal theme (theme <color>)',
     help: 'Shows this help message',
     command: 'Show command panel',
@@ -90,6 +98,9 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
       case 'game':
         setShowGame(true);
         output = <p>Launching PIXEL_SMASH.EXE...</p>;
+        break;
+      case 'leaderboard':
+        output = <Leaderboard />;
         break;
       case 'theme':
         if (args.length < 2) {
@@ -185,7 +196,7 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
         setInput(''); // Clear chat input when entering chat mode
     } else {
         setHistory([
-            <div key="welcome">
+            <div key="welcome" className="theme-text">
                 <p>Welcome to my interactive terminal portfolio.</p>
                 <p className="mt-1">
                     Type &apos;<span className="theme-accent">help</span>&apos; to see the list of available commands.
@@ -263,7 +274,9 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
                   value={isChatMode ? input : prompt}
                   onChange={isChatMode ? handleInputChange : (e) => setPrompt(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="bg-transparent border-none text-white focus:outline-none w-full ml-2"
+                  className="bg-transparent border-none theme-text focus:outline-none w-full ml-2"
+                  placeholder=""
+                  title="Terminal input"
               />
           </div>
       </div>

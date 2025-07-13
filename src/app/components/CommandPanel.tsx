@@ -4,7 +4,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
-const KeyButton = ({ label, active }) => (
+interface KeyButtonProps {
+  label: string;
+  active: boolean;
+}
+
+const KeyButton: React.FC<KeyButtonProps> = ({ label, active }) => (
         <div className={`w-12 h-12 flex items-center justify-center border-2 theme-border theme-text font-bold text-xl
       ${active ? 'theme-primary theme-background' : 'theme-background'}
         transition-colors duration-100 ease-in-out
@@ -13,7 +18,12 @@ const KeyButton = ({ label, active }) => (
     </div>
 );
 
-export default function CommandPanel({ onKonamiCode, onClose }) {
+interface CommandPanelProps {
+  onKonamiCode: () => void;
+  onClose: () => void;
+}
+
+export default function CommandPanel({ onKonamiCode, onClose }: CommandPanelProps) {
     const [sequence, setSequence] = useState<string[]>([]);
     const [activeKey, setActiveKey] = useState<string | null>(null);
 

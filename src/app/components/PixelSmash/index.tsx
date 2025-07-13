@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import p5 from 'p5';
 import RetroModal from './RetroModal';
+import GameOverScreen from './GameOverScreen';
 
 // 導入所有模組
 import type { GameState } from './types/GameTypes';
@@ -16,6 +17,7 @@ interface PixelSmashProps {
 const PixelSmash: React.FC<PixelSmashProps> = ({ onClose }) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const p5InstanceRef = useRef<p5 | null>(null);
+  const [showGameOverScreen, setShowGameOverScreen] = useState(false);
   const gameStateRef = useRef<GameState>({
     state: 'start',
     score: 0,
@@ -32,6 +34,20 @@ const PixelSmash: React.FC<PixelSmashProps> = ({ onClose }) => {
   const forceUpdateComponent = useCallback(() => {
     forceUpdate({});
   }, []);
+
+  const handleGameRestart = useCallback(() => {
+    setShowGameOverScreen(false);
+    gameStateRef.current.state = 'start';
+    gameStateRef.current.score = 0;
+    gameStateRef.current.lives = 3;
+    gameStateRef.current.level = 1;
+    gameStateRef.current.powerUps = [];
+    gameStateRef.current.paused = false;
+    gameStateRef.current.paddle = null;
+    gameStateRef.current.balls = [];
+    gameStateRef.current.bricks = [];
+    forceUpdateComponent();
+  }, [forceUpdateComponent]);
 
   const cleanup = useCallback(() => {
     console.log('Cleanup called');
@@ -101,7 +117,9 @@ const PixelSmash: React.FC<PixelSmashProps> = ({ onClose }) => {
         await loadWebFont();
 
         // 初始化遊戲管理器
-        gameManager = new GameManager(gameStateRef, forceUpdateComponent, p);
+        gameManager = new GameManager(gameStateRef, forceUpdateComponent, p, () => {
+          setShowGameOverScreen(true);
+        });
 
         gameStateRef.current.state = 'start';
         setupComplete = true;
@@ -282,6 +300,14 @@ const PixelSmash: React.FC<PixelSmashProps> = ({ onClose }) => {
       onClose={onClose}
       title="🎮 PIXEL_SMASH.EXE"
     >
+      {showGameOverScreen ? (
+        <GameOverScreen
+          score={gameStateRef.current.score}
+          level={gameStateRef.current.level}
+          onRestart={handleGameRestart}
+          onClose={onClose}
+        />
+      ) : (
               <div className="flex flex-col lg:flex-row gap-4 p-4 theme-background theme-text font-mono max-h-[80vh] overflow-y-auto">
         {/* 遊戲畫布區域 */}
                   <div className="flex-1">
@@ -356,6 +382,7 @@ const PixelSmash: React.FC<PixelSmashProps> = ({ onClose }) => {
         </button>
         </div>
       </div>
+      )}
     </RetroModal>
   );
 };

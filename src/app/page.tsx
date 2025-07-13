@@ -9,11 +9,11 @@ export default function Home() {
   const [chatMode, setChatMode] = useState(false);
 
   return (
-    <main className="p-4">
+    <main className="p-4 theme-text">
       <AsciiHero />
-      <Terminal 
-        isChatMode={chatMode} 
-        onExitChat={() => setChatMode(false)} 
+      <Terminal
+        isChatMode={chatMode}
+        onExitChat={() => setChatMode(false)}
         onEnterChat={() => setChatMode(true)}
       />
     </main>
