@@ -1,4 +1,3 @@
-
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import About from '@/app/components/About';
@@ -8,11 +7,17 @@ import Contact from '@/app/components/Contact';
 import { useChat } from 'ai/react';
 import CommandPanel from '@/app/components/CommandPanel';
 import ProgressBar from '@/app/components/ProgressBar';
+import dynamic from 'next/dynamic';
+
+const PixelSmash = dynamic(() => import('@/app/components/PixelSmash'), { ssr: false });
 
 export default function TerminalController({ isChatMode, onExitChat, onEnterChat }) {
   const [history, setHistory] = useState<React.ReactNode[]>([]);
   const [prompt, setPrompt] = useState('');
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
   const [showCommandPanel, setShowCommandPanel] = useState(false);
+  const [showGame, setShowGame] = useState(false);
   
   const terminalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -27,6 +32,7 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
     skills: 'My professional skills',
     projects: 'My featured projects',
     contact: 'How to reach me',
+    game: 'Run the PIXEL_SMASH game',
     help: 'Shows this help message',
     command: 'Show command panel',
     clear: 'Clears the terminal history',
@@ -75,6 +81,10 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
       case 'command':
         setShowCommandPanel(true);
         break;
+      case 'game':
+        setShowGame(true);
+        output = <p>Launching PIXEL_SMASH.EXE...</p>;
+        break;
       case '':
         break;
       default:
@@ -93,18 +103,41 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-        if (isChatMode) {
-            if (input.trim().toLowerCase() === 'exit') {
-                onExitChat();
-                setMessages([]); // Clear chat history when exiting
-            } else {
-                handleSubmit(e as any);
-            }
+    if (e.key === 'ArrowUp') {
+      if (!isChatMode && commandHistory.length > 0) {
+        e.preventDefault();
+        const newIndex = historyIndex === -1 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1);
+        setHistoryIndex(newIndex);
+        setPrompt(commandHistory[newIndex]);
+      }
+    } else if (e.key === 'ArrowDown') {
+      if (!isChatMode && historyIndex !== -1) {
+        e.preventDefault();
+        if (historyIndex < commandHistory.length - 1) {
+          const newIndex = historyIndex + 1;
+          setHistoryIndex(newIndex);
+          setPrompt(commandHistory[newIndex]);
         } else {
-            processCommand(prompt);
-            setPrompt('');
+          setHistoryIndex(-1);
+          setPrompt('');
         }
+      }
+    } else if (e.key === 'Enter') {
+      if (isChatMode) {
+        if (input.trim().toLowerCase() === 'exit') {
+          onExitChat();
+          setMessages([]); // Clear chat history when exiting
+        } else {
+          handleSubmit(e as any);
+        }
+      } else {
+        if (prompt.trim() !== '') {
+          setCommandHistory([...commandHistory, prompt]);
+        }
+        processCommand(prompt);
+        setPrompt('');
+        setHistoryIndex(-1);
+      }
     }
   };
 
@@ -156,49 +189,52 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
   const promptSuffix = '>';
 
   return (
-    <div 
-        className="h-[400px] w-full border border-green-600/30 bg-black p-4 rounded-md font-mono flex flex-col text-lg"
-        onClick={handleClick}
-    >
-        <div className="flex-grow overflow-y-auto" ref={terminalRef}>
-            {!isChatMode && history}
-            {isChatMode && (
-                <>
-                    {history} {/* Display chat mode welcome/hint */}
-                    {messages.map(m => (
-                        <div key={m.id} className="mb-1">
-                            <strong>{`${m.role === 'user' ? 'You' : 'AI'}: `}</strong>
-                            <span className={`${m.role === 'assistant' ? 'text-green-400' : 'text-white'}`}>
-                                {m.content}
-                            </span>
-                        </div>
-                    ))}
-                    {isLoading && <ProgressBar isLoading={true} />}
-                </>
-            )}
-            <div ref={bottomRef} />
-        </div>
-        {showCommandPanel && (
-            <CommandPanel 
-                onKonamiCode={() => {
-                    onEnterChat();
-                    setShowCommandPanel(false);
-                }}
-                onClose={() => setShowCommandPanel(false)}
-            />
-        )}
-        <div className="flex items-center mt-2 flex-shrink-0">
-            {promptPrefix && <span className="text-cyan-400 mr-1">{promptPrefix}</span>}
-            <span className="text-cyan-400">{promptSuffix}</span>
-            <input
-                ref={inputRef}
-                type="text"
-                value={isChatMode ? input : prompt}
-                onChange={isChatMode ? handleInputChange : (e) => setPrompt(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="bg-transparent border-none text-white focus:outline-none w-full ml-2"
-            />
-        </div>
-    </div>
+    <>
+      {showGame && <PixelSmash onClose={() => setShowGame(false)} />}
+      <div 
+          className="h-[400px] w-full border border-green-600/30 bg-black p-4 rounded-md font-mono flex flex-col text-lg"
+          onClick={handleClick}
+      >
+          <div className="flex-grow overflow-y-auto" ref={terminalRef}>
+              {!isChatMode && history}
+              {isChatMode && (
+                  <>
+                      {history} {/* Display chat mode welcome/hint */}
+                      {messages.map(m => (
+                          <div key={m.id} className="mb-1">
+                              <strong>{`${m.role === 'user' ? 'You' : 'AI'}: `}</strong>
+                              <span className={`${m.role === 'assistant' ? 'text-green-400' : 'text-white'}`}>
+                                  {m.content}
+                              </span>
+                          </div>
+                      ))}
+                      {isLoading && <ProgressBar isLoading={true} />}
+                  </>
+              )}
+              <div ref={bottomRef} />
+          </div>
+          {showCommandPanel && (
+              <CommandPanel 
+                  onKonamiCode={() => {
+                      onEnterChat();
+                      setShowCommandPanel(false);
+                  }}
+                  onClose={() => setShowCommandPanel(false)}
+              />
+          )}
+          <div className="flex items-center mt-2 flex-shrink-0">
+              {promptPrefix && <span className="text-cyan-400 mr-1">{promptPrefix}</span>}
+              <span className="text-cyan-400">{promptSuffix}</span>
+              <input
+                  ref={inputRef}
+                  type="text"
+                  value={isChatMode ? input : prompt}
+                  onChange={isChatMode ? handleInputChange : (e) => setPrompt(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="bg-transparent border-none text-white focus:outline-none w-full ml-2"
+              />
+          </div>
+      </div>
+    </>
   );
 }
