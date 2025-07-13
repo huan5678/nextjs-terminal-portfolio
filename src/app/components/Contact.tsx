@@ -58,11 +58,11 @@ const Contact: React.FC = () =>
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-cyan-400 hover:underline flex-shrink min-w-0 break-all"
+                className="theme-accent hover:underline flex-shrink min-w-0 break-all"
               >
                 <TypingAnimation
                   text={item.value}
-                  className="text-cyan-400 text-base font-mono text-left"
+                                      className="theme-accent text-base font-mono text-left"
                   onComplete={visibleValues === index ? handleValueComplete : undefined}
                 />
               </a>

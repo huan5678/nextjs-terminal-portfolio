@@ -8,8 +8,10 @@ import { useChat } from 'ai/react';
 import CommandPanel from '@/app/components/CommandPanel';
 import ProgressBar from '@/app/components/ProgressBar';
 import dynamic from 'next/dynamic';
+import { useTheme } from '@/contexts/ThemeContext';
+import { themes } from '@/config/themes';
 
-const PixelSmash = dynamic(() => import('@/app/components/PixelSmash'), { ssr: false });
+import PixelSmash from './PixelSmash';
 
 export default function TerminalController({ isChatMode, onExitChat, onEnterChat }) {
   const [history, setHistory] = useState<React.ReactNode[]>([]);
@@ -18,7 +20,8 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [showCommandPanel, setShowCommandPanel] = useState(false);
   const [showGame, setShowGame] = useState(false);
-  
+  const { setTheme, availableThemes, currentTheme } = useTheme();
+
   const terminalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -33,6 +36,7 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
     projects: 'My featured projects',
     contact: 'How to reach me',
     game: 'Run the PIXEL_SMASH game',
+    theme: 'Change terminal theme (theme <color>)',
     help: 'Shows this help message',
     command: 'Show command panel',
     clear: 'Clears the terminal history',
@@ -46,7 +50,7 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
       <ul className="list-none pl-2">
         {commandList.map((cmd) => (
           <li key={cmd} className="flex items-center gap-x-4">
-            <span className="text-cyan-400 w-20">{cmd}</span>
+            <span className="theme-accent w-20">{cmd}</span>
             <span className="text-neutral-400">{commandDescriptions[cmd]}</span>
           </li>
         ))}
@@ -55,11 +59,13 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
   );
 
   const processCommand = (command: string) => {
-    const newHistory = [...history, <div key={history.length}><span className="text-cyan-400">&gt;</span> {command}</div>];
+    const newHistory = [...history, <div key={history.length}><span className="theme-accent">&gt;</span> {command}</div>];
     const cmd = command.toLowerCase().trim();
+    const args = cmd.split(' ');
+    const mainCmd = args[0];
     let output: React.ReactNode = null;
 
-    switch (cmd) {
+    switch (mainCmd) {
       case 'about':
         output = <About />;
         break;
@@ -85,11 +91,37 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
         setShowGame(true);
         output = <p>Launching PIXEL_SMASH.EXE...</p>;
         break;
+      case 'theme':
+        if (args.length < 2) {
+          output = (
+            <div>
+              <p className="theme-warning">Available themes:</p>
+              <ul className="ml-4 mt-2">
+                {availableThemes.map((theme) => (
+                  <li key={theme} className="theme-accent">
+                    {theme} - {themes[theme].displayName}
+                  </li>
+                ))}
+              </ul>
+              <p className="theme-text-secondary mt-2">Usage: theme &lt;color&gt;</p>
+              <p className="theme-text-secondary">Current theme: {currentTheme.displayName}</p>
+            </div>
+          );
+        } else {
+          const themeName = args[1];
+          if (availableThemes.includes(themeName as any)) {
+            setTheme(themeName as any);
+            output = <p className="theme-success">Theme changed to: {themes[themeName as keyof typeof themes].displayName}</p>;
+          } else {
+            output = <p className="theme-error">Unknown theme: {themeName}. Type 'theme' to see available themes.</p>;
+          }
+        }
+        break;
       case '':
         break;
       default:
         output = (
-          <p className="text-red-400">
+          <p className="theme-error">
             Command not found: {cmd}. Type 'help' for available commands.
           </p>
         );
@@ -156,7 +188,7 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
             <div key="welcome">
                 <p>Welcome to my interactive terminal portfolio.</p>
                 <p className="mt-1">
-                    Type &apos;<span className="text-cyan-400">help</span>&apos; to see the list of available commands.
+                    Type &apos;<span className="theme-accent">help</span>&apos; to see the list of available commands.
                 </p>
             </div>
         ]);
@@ -191,8 +223,8 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
   return (
     <>
       {showGame && <PixelSmash onClose={() => setShowGame(false)} />}
-      <div 
-          className="h-[400px] w-full border border-green-600/30 bg-black p-4 rounded-md font-mono flex flex-col text-lg"
+            <div
+          className="h-[400px] w-full border theme-border/30 theme-background p-4 rounded-md font-mono flex flex-col text-lg theme-glow"
           onClick={handleClick}
       >
           <div className="flex-grow overflow-y-auto" ref={terminalRef}>
@@ -203,7 +235,7 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
                       {messages.map(m => (
                           <div key={m.id} className="mb-1">
                               <strong>{`${m.role === 'user' ? 'You' : 'AI'}: `}</strong>
-                              <span className={`${m.role === 'assistant' ? 'text-green-400' : 'text-white'}`}>
+                              <span className={`${m.role === 'assistant' ? 'theme-primary' : 'theme-text'}`}>
                                   {m.content}
                               </span>
                           </div>
@@ -214,7 +246,7 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
               <div ref={bottomRef} />
           </div>
           {showCommandPanel && (
-              <CommandPanel 
+              <CommandPanel
                   onKonamiCode={() => {
                       onEnterChat();
                       setShowCommandPanel(false);
@@ -223,8 +255,8 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
               />
           )}
           <div className="flex items-center mt-2 flex-shrink-0">
-              {promptPrefix && <span className="text-cyan-400 mr-1">{promptPrefix}</span>}
-              <span className="text-cyan-400">{promptSuffix}</span>
+                        {promptPrefix && <span className="theme-accent mr-1">{promptPrefix}</span>}
+          <span className="theme-accent">{promptSuffix}</span>
               <input
                   ref={inputRef}
                   type="text"

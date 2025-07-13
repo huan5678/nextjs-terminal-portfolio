@@ -1,0 +1,74 @@
+/* 主題 CSS 變數 */
+:root {
+  /* 預設主題顏色 */
+  --theme-primary: #00ff00;
+  --theme-secondary: #00cc00;
+  --theme-background: #000000;
+  --theme-surface: #1a1a1a;
+  --theme-text: #00ff00;
+  --theme-text-secondary: #00cc00;
+  --theme-border: #00ff00;
+  --theme-accent: #00ffff;
+  --theme-success: #00ff00;
+  --theme-warning: #ffff00;
+  --theme-error: #ff0000;
+  --theme-glow: rgba(0, 255, 0, 0.3);
+
+  /* 預設效果 */
+  --theme-text-shadow: 0 0 10px #00ff00;
+  --theme-box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  --theme-glow-effect: 0 0 15px rgba(0, 255, 0, 0.5);
+}
+
+/* 主題相關的 utility classes */
+.theme-primary {
+  color: var(--theme-primary);
+}
+
+.theme-secondary {
+  color: var(--theme-secondary);
+}
+
+.theme-text {
+  color: var(--theme-text);
+}
+
+.theme-text-secondary {
+  color: var(--theme-text-secondary);
+}
+
+.theme-background {
+  background-color: var(--theme-background);
+}
+
+.theme-surface {
+  background-color: var(--theme-surface);
+}
+
+.theme-border {
+  border-color: var(--theme-border);
+}
+
+.theme-glow {
+  box-shadow: var(--theme-box-shadow);
+}
+
+.theme-text-glow {
+  text-shadow: var(--theme-text-shadow);
+}
+
+.theme-accent {
+  color: var(--theme-accent);
+}
+
+.theme-success {
+  color: var(--theme-success);
+}
+
+.theme-warning {
+  color: var(--theme-warning);
+}
+
+.theme-error {
+  color: var(--theme-error);
+}

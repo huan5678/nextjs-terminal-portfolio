@@ -76,7 +76,7 @@ const Skills: React.FC = () =>
           <div key={index} className="mb-4">
             <TypingAnimation
               text={`# ${item.category}`}
-              className="text-green-400 text-base font-mono text-left"
+              className="theme-primary text-base font-mono text-left"
               onComplete={index === visibleCategories ? handleCategoryComplete : undefined}
             />
             {(index < visibleCategories || (visibleSkills >= 0 && index === visibleCategories)) && (

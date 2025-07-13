@@ -28,7 +28,7 @@ export default function ProgressBar({ isLoading = false }) {
   const empty = '░'.repeat(emptyLength);
 
   return (
-    <pre className="text-green-500 font-mono text-lg">
+          <pre className="theme-primary font-mono text-lg">
       {`[${filled}${empty}] ${progress}%`}
     </pre>
   );

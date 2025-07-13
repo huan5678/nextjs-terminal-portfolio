@@ -55,7 +55,7 @@ const Projects: React.FC = () =>
             <div className="flex items-center gap-x-2">
               <TypingAnimation
                 text={project.title}
-                className="text-cyan-400 font-bold text-base font-mono text-left"
+                className="theme-accent font-bold text-base font-mono text-left"
                 onComplete={index === visibleProjects ? handleTitleComplete : undefined}
               />
             </div>
@@ -63,7 +63,7 @@ const Projects: React.FC = () =>
               <div className="pl-4 border-l-2 border-neutral-700 flex flex-col gap-y-1 mt-1">
                 {(index < visibleProjects || visibleDetails >= 0) && (
                   <div>
-                    <span className="text-yellow-400 w-20 inline-block shrink-0">描述:</span>
+                    <span className="theme-warning w-20 inline-block shrink-0">描述:</span>
                     <TypingAnimation
                       text={project.description}
                       className="text-neutral-300 text-base font-mono text-left"
@@ -73,7 +73,7 @@ const Projects: React.FC = () =>
                 )}
                 {(index < visibleProjects || visibleDetails >= 1) && (
                   <div>
-                    <span className="text-yellow-400 w-20 inline-block shrink-0">技術:</span>
+                    <span className="theme-warning w-20 inline-block shrink-0">技術:</span>
                     <TypingAnimation
                       text={project.tech.join(', ')}
                       className="text-neutral-300 text-base font-mono text-left"
@@ -83,7 +83,7 @@ const Projects: React.FC = () =>
                 )}
                 {(index < visibleProjects || visibleDetails >= 2) && (
                   <div>
-                    <span className="text-yellow-400 w-20 inline-block shrink-0">狀態:</span>
+                    <span className="theme-warning w-20 inline-block shrink-0">狀態:</span>
                     <TypingAnimation
                       text={project.status}
                       className="text-pink-400 text-base font-mono text-left"

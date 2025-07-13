@@ -4,6 +4,7 @@ import "primereact/resources/themes/lara-dark-cyan/theme.css";
 import "primeicons/primeicons.css";
 import "@/styles/globals.css";
 import MergedBackground from "@/app/components/MergedBackground";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const fusionPixel = localFont({
   src: '../../public/fonts/fusion-pixel-12px-monospaced-zh_hant.otf.woff2',
@@ -23,8 +24,10 @@ export default function RootLayout({
   return (
     <html lang="zh-tw">
       <body className={fusionPixel.variable}>
-        <MergedBackground />
-        {children}
+        <ThemeProvider>
+          <MergedBackground />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
