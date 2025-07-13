@@ -101,7 +101,7 @@ const Leaderboard: React.FC = () => {
 
       <div className="mt-6 text-center theme-text-secondary text-sm">
         <p>💡 提示：玩 PixelSmash 遊戲為你的國家爭取更高排名！</p>
-        <p className="mt-1">輸入 <span className="theme-accent">game</span> 開始遊戲</p>
+        <p className="mt-1">輸入 <span className="theme-accent">game pixel-smash</span> 開始遊戲</p>
       </div>
     </div>
   );

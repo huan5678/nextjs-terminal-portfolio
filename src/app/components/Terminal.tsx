@@ -13,6 +13,7 @@ import { themes } from '@/config/themes';
 import Leaderboard from './Leaderboard';
 
 import PixelSmash from './PixelSmash';
+import BullsAndCows from './BullsAndCows';
 
 interface TerminalControllerProps {
   isChatMode: boolean;
@@ -27,6 +28,7 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [showCommandPanel, setShowCommandPanel] = useState(false);
   const [showGame, setShowGame] = useState(false);
+  const [showBullsAndCows, setShowBullsAndCows] = useState(false);
   const { setTheme, availableThemes, currentTheme } = useTheme();
 
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -42,7 +44,7 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
     skills: 'My professional skills',
     projects: 'My featured projects',
     contact: 'How to reach me',
-    game: 'Run the PIXEL_SMASH game',
+    game: 'A collection of games. Use "game <game_name>" to play.',
     leaderboard: 'Show PixelSmash world leaderboard',
     theme: 'Change terminal theme (theme <color>)',
     help: 'Shows this help message',
@@ -57,7 +59,7 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
       <p className="mb-2 text-neutral-300">Available commands:</p>
       <ul className="list-none pl-2">
         {commandList.map((cmd) => (
-          <li key={cmd} className="flex items-center gap-x-4">
+          <li key={cmd} className="flex items-center gap-x-16">
             <span className="theme-accent w-20">{cmd}</span>
             <span className="text-neutral-400">{commandDescriptions[cmd]}</span>
           </li>
@@ -68,12 +70,10 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
 
   const processCommand = (command: string) => {
     const newHistory = [...history, <div key={history.length}><span className="theme-accent">&gt;</span> {command}</div>];
-    const cmd = command.toLowerCase().trim();
-    const args = cmd.split(' ');
-    const mainCmd = args[0];
+    const [cmd, ...args] = command.toLowerCase().split(' ');
     let output: React.ReactNode = null;
 
-    switch (mainCmd) {
+    switch (cmd) {
       case 'about':
         output = <About />;
         break;
@@ -95,10 +95,34 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
       case 'command':
         setShowCommandPanel(true);
         break;
-      case 'game':
-        setShowGame(true);
-        output = <p>Launching PIXEL_SMASH.EXE...</p>;
+      case 'game': {
+        const [subcommand] = args;
+        if (!subcommand) {
+          output = (
+            <div>
+              <p>Usage: game &lt;command&gt;</p>
+              <p>Available commands:</p>
+              <p>  pixel-smash - Play the Pixel Smash game</p>
+              <p>  guess-digit - Play the Guess Digit game</p>
+            </div>
+          );
+        } else {
+          switch (subcommand) {
+            case 'pixel-smash':
+              setShowGame(true);
+              output = <p>Launching PIXEL_SMASH.EXE...</p>;
+              break;
+            case 'guess-digit':
+              setShowBullsAndCows(true);
+              output = <p>Launching GuessDigit.EXE...</p>;
+              break;
+            default:
+              output = <p>game: unknown subcommand '{subcommand}'</p>;
+              break;
+          }
+        }
         break;
+      }
       case 'leaderboard':
         output = <Leaderboard />;
         break;
@@ -234,6 +258,7 @@ export default function TerminalController({ isChatMode, onExitChat, onEnterChat
   return (
     <>
       {showGame && <PixelSmash onClose={() => setShowGame(false)} />}
+      {showBullsAndCows && <BullsAndCows onClose={() => setShowBullsAndCows(false)} />}
             <div
           className="h-[400px] w-full border theme-border/30 theme-background p-4 rounded-md font-mono flex flex-col text-lg theme-glow"
           onClick={handleClick}
